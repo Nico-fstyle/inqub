@@ -1,0 +1,118 @@
+Project Setup:
+  ☐ create basic html page with minor css
+  ☐ running project on local web server
+  ☐ add phaser 3 library
+  ☐ create a basic phaser 3 game instance
+  ☐ add jsconfig to get phaser 3 types and intellisense
+
+Game Project Assets:
+  ☐ download game assets and add to project
+  ☐ show links to where assets can be found
+
+Battle System:
+  ☐ load game assets
+  ☐ create battle scene layout
+  ☐ create dialog menu
+  ☐ create option menu
+  ☐ create monster attack move list
+  ☐ handle player input
+  ☐ code optimization - move logic to components
+    ☐ create health component
+    ☐ create background component
+    ☐ create monster components
+  ☐ adding basic attack logic
+  ☐ taking damage and monster knock out
+  ☐ battle state machine
+    ☐ what is a finite state machine
+    ☐ review the battle states and what each one represents
+    ☐ implement each state
+    ☐ add item, flee, and monster states
+    ☐ player input improvements
+  ☐ battle scene polish
+    ☐ text animations
+    ☐ monster animations
+    ☐ skip animations
+    ☐ attack animations
+    ☐ scene transitions
+    ☐ custom fonts
+
+World Scene:
+  ☐ load level background
+  ☐ create player
+  ☐ handle player input
+  ☐ camera movement
+  ☐ handle grid based movement
+  ☐ handle collisions
+  ☐ add wild monster encounter logic
+  ☐ store player position in data manager
+
+Level Development With Tiled:
+  ☐ Basic level design concepts
+  ☐ Add collision layer
+  ☐ Add custom types to Tiled
+  ☐ Add game objects
+  ☐ Add npcs
+  ☐ Exporting level images and JSON
+
+World Scene Part 2:
+  ☐ add interactive game objects
+  ☐ dialog ui component
+  ☐ add npcs
+  ☐ add npc dialog
+  ☐ add npc movement
+
+Title Screen:
+  ☐ create basic title screen
+  ☐ add options menu
+  ☐ save & loading options
+  ☐ connecting option data to battle scene
+
+Tools Part 1:
+  ☐ using tweakpane for testing
+    ☐ positioning game objects
+    ☐ monster attacks
+    ☐ animations
+
+Saving & Loading:
+  ☐ add game menu with option to save game
+  ☐ update menu scene with continue option to load game
+  ☐ on new game, we should reset the player data (pos, monsters, etc)
+  ☐ update data manager to persist monster data and current stats
+
+Inventory:
+  ☐ create class for items and inventory
+  ☐ create ui screen for viewing items
+  ☐ update menu to have view bag
+  ☐ update battle scene to allow using items
+  ☐ update data manager to allow saving of inventory items
+
+Battle Scene Part 2:
+  ☐ using items
+  ☐ running away
+  ☐ enemy random attack
+  ☐ player faint
+  ☐ attacking order
+  ☐ dynamic monster data based on player party and encounter
+
+World Scene Part 3:
+  ☐ advanced wild monster encounter logic
+  ☐ adding a game menu
+    ☐ view inventory
+    ☐ view monster party
+  ☐ buildings
+  ☐ items in the field
+
+-------------------------------
+
+Future Content:
+  ☐ cutscenes
+  ☐ in game events and tracking
+  ☐ shops
+  ☐ battle npcs
+  ☐ monster encyclopedia
+  ☐ monster league/gyms
+
+
+-------------------------------
+☐ ✔ ✘
+-------------------------------
