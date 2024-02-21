@@ -2,6 +2,7 @@ import Phaser from '../../lib/phaser.js';
 import { DIRECTION } from '../../common/direction.js';
 import { getTargetPositionFromGameObjectPositionAndDirection } from '../../utils/grid-utils.js';
 import { exhaustiveGuard } from '../../utils/guard.js';
+import { TILE_SIZE } from '../../config.js';
 
 /**
  * @typedef CharacterIdleFrameConfig
@@ -24,6 +25,20 @@ import { exhaustiveGuard } from '../../utils/guard.js';
  * @property {() => void} [spriteGridMovementFinishedCallback] an optional callback that will be called after each step of the grid movement is complete
  * @property {CharacterIdleFrameConfig} idleFrameConfig
  * @property {Phaser.Tilemaps.TilemapLayer} [collisionLayer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work1Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work2Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work3Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work4Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work5Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work6Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work7Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [work8Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [chiefLayer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [reunion1Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [reunion2Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [reunion3Layer]
+ * @property {Phaser.Tilemaps.TilemapLayer} [reunion4Layer]
+ * @property {number} [place]
  */
 
 export class Character {
@@ -64,6 +79,9 @@ export class Character {
     this._idleFrameConfig = config.idleFrameConfig;
     this._origin = config.origin ? { ...config.origin } : { x: 0, y: 0 };
     this._collisionLayer = config.collisionLayer;
+
+    this.place = config.place;
+    
     this._phaserGameObject = this._scene.add
       .sprite(config.position.x, config.position.y, config.assetKey, this._getIdleFrame())
       .setOrigin(this._origin.x, this._origin.y)
@@ -179,7 +197,7 @@ export class Character {
 
     this._scene.add.tween({
       delay: 0,
-      duration: 150,
+      duration: 10,
       y: {
         from: this._phaserGameObject.y,
         start: this._phaserGameObject.y,
@@ -211,8 +229,16 @@ export class Character {
     }
 
     const { x, y } = position;
-    const tile = this._collisionLayer.getTileAtWorldXY(x, y, true);
+    const tile1 = this._collisionLayer.getTileAtWorldXY(x, y, true);
+    const tile2 = this._collisionLayer.getTileAtWorldXY(x + 4*TILE_SIZE, y , true);
+    const tile3 = this._collisionLayer.getTileAtWorldXY(x, y + 4*TILE_SIZE , true);
+    const tile4 = this._collisionLayer.getTileAtWorldXY(x + 2*TILE_SIZE, y + 2*TILE_SIZE , true);
 
-    return tile.index !== -1;
+
+    return tile1.index !== -1 || tile2.index !== -1 || tile3.index !== -1 || tile4.index !== -1;
   }
+
+
+
+
 }
