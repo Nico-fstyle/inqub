@@ -5,6 +5,11 @@ import { Player } from '../world/characters/player.js';
 import { Controls } from '../utils/controls.js';
 import { DIRECTION } from '../common/direction.js';
 import { TILED_COLLISION_LAYER_ALPHA, TILE_SIZE } from '../config.js';
+import socket from '../main.js';
+import players from '../main.js';
+
+
+
 
 
 /** @type {import('../types/typedef.js').Coordinate} */
@@ -269,6 +274,8 @@ export class WorldScene extends Phaser.Scene {
 
     this.add.image(0, 0, WORLD_ASSET_KEYS.WORLD_BACKGROUND, 0).setOrigin(0);
 
+    
+    
     this.#player = new Player({
       scene: this,
       position: PLAYER_POSITION,
@@ -367,9 +374,14 @@ export class WorldScene extends Phaser.Scene {
     const selectedDirection = this.#controls.getDirectionKeyPressedDown();
     if (selectedDirection !== DIRECTION.NONE) {
       this.#player.moveCharacter(selectedDirection);
+      socket.emit('move', {
+        x: this.#player.sprite.x,
+        y: this.#player.sprite.y,
+      });
     }
 
     this.#player.update(time);
+
 
 
 };

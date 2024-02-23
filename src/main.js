@@ -5,6 +5,22 @@ import { BattleScene } from './scenes/battle-scene.js';
 import { WorldScene } from './scenes/world-scene.js';
 
 
+
+
+const socket = io(`ws://localhost:5000`);
+
+let players = [];
+
+export default socket  ;
+
+socket.on('connect', () => {
+  console.log('connected');
+});
+
+socket.on('players', (serverPlayers) => {
+  players = serverPlayers;
+});
+
 const game = new Phaser.Game({
   type: Phaser.CANVAS,
   pixelArt: true,
@@ -18,6 +34,8 @@ const game = new Phaser.Game({
   backgroundColor: '#000000',
 });
 
+
+
 window.addEventListener('load', () => {
   const canvas = document.querySelector('canvas');
   if (canvas) {
@@ -26,6 +44,10 @@ window.addEventListener('load', () => {
 
   }
 });
+
+
+
+
 
 game.scene.add(SCENE_KEYS.PRELOAD_SCENE, PreloadScene);
 game.scene.add(SCENE_KEYS.WORLD_SCENE, WorldScene);

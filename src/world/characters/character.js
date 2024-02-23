@@ -113,6 +113,7 @@ export class Character {
       return;
     }
     this._moveSprite(direction);
+
   }
 
   /**
@@ -191,6 +192,9 @@ export class Character {
     }
 
     const updatedPosition = getTargetPositionFromGameObjectPositionAndDirection(this._targetPosition, this._direction);
+    
+    
+
     this._previousTargetPosition = { ...this._targetPosition };
     this._targetPosition.x = updatedPosition.x;
     this._targetPosition.y = updatedPosition.y;
