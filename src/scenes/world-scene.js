@@ -6,6 +6,7 @@ import { Controls } from '../utils/controls.js';
 import { DIRECTION } from '../common/direction.js';
 import { TILED_COLLISION_LAYER_ALPHA, TILE_SIZE } from '../config.js';
 
+
 /** @type {import('../types/typedef.js').Coordinate} */
 const PLAYER_POSITION = Object.freeze({
   x: 82 * TILE_SIZE,
@@ -278,7 +279,7 @@ export class WorldScene extends Phaser.Scene {
         this.#handlePlayerMovementUpdate();
       }
     });
-    const CAMERA_SPEED = 0.2;
+    const CAMERA_SPEED = 0.7;
     this.M = [this.#work1Layer, this.#work2Layer, this.#work3Layer, this.#work4Layer, this.#work5Layer, this.#work6Layer, this.#work7Layer, this.#work8Layer, this.#chiefLayer, this.#reunion1Layer, this.#reunion2Layer, this.#reunion3Layer, this.#reunion4Layer];
 
 
@@ -381,12 +382,9 @@ export class WorldScene extends Phaser.Scene {
     const isLayer = this.M[i].getTileAtWorldXY(this.#player.sprite.x, this.#player.sprite.y, true).index !== -1;
     if (!isLayer) {
       this.M[i].setDepth(-1);
-      console.log('Layer not on load');
-
     }
     else {
-      console.log('Layer connect on load');
-      this.M[i].setDepth(1);
+      this.M[i].setDepth(1).setAlpha(0.2);
     }
  
   }
