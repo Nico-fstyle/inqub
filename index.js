@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const app = express();
 
 const { createServer } = require('http');
-
+console.log('Lien vers le serveur express nodemon : %c http://localhost:5000/', 'color: blue; text-decoration: underline;');
 const httpServer = createServer(app);
 
 const io = new Server(httpServer);
@@ -42,7 +42,19 @@ io.on('connect', (socket) => {
     
     socket.on('move', (movements) => {
         moveMap[socket.id] = movements;
-        console.log(moveMap);    });
+        console.log(movements);
+
+          });
+
+    socket.on('encounter', (data) => {
+        console.log(data.layer);
+    if (data.layer[1] === 1) {
+            console.log(`player ${socket.id} entered layer ${data.layer[0]}`);
+        }
+        else {
+            console.log(`player ${socket.id} exited layer ${data.layer[0]}`);
+        };
+    })
 });
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));

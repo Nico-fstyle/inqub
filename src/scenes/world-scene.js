@@ -386,6 +386,7 @@ export class WorldScene extends Phaser.Scene {
 
 };
 
+
  
 #handlePlayerMovementUpdate() {
 
@@ -393,15 +394,30 @@ export class WorldScene extends Phaser.Scene {
   
     const isLayer = this.M[i].getTileAtWorldXY(this.#player.sprite.x, this.#player.sprite.y, true).index !== -1;
     if (!isLayer) {
+      if (this.M[i].depth === 1) {
+        socket.emit('encounter', {
+        layer: [i,-1]
+      });
+      
       this.M[i].setDepth(-1);
     }
+      
+    }
     else {
+      if (this.M[i].depth === -1 || this.M[i].depth === 0) {
+      socket.emit('encounter', {
+        layer: [i,1]
+      });   
+      
       this.M[i].setDepth(1).setAlpha(0.2);
+    }   
+
     }
  
   }
   return;
   
 }
+
 
 }
