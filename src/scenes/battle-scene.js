@@ -1,5 +1,5 @@
-import Phaser from '../lib/phaser.js';
-import { MONSTER_ASSET_KEYS } from '../assets/asset-keys.js';
+import Phaser from '../lib/phaser.mjs';
+import { MONSTER_ASSET_KEYS } from '../assets/asset-keys.mjs';
 import { BattleMenu } from '../battle/ui/menu/battle-menu.js';
 import { SCENE_KEYS } from './scene-keys.js';
 import { DIRECTION } from '../common/direction.js';

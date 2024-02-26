@@ -1,4 +1,4 @@
-import Phaser from '../../lib/phaser.js';
+import Phaser from '../../lib/phaser.mjs';
 import { exhaustiveGuard } from '../../utils/guard.js';
 import { ATTACK_KEYS } from './attack-keys.js';
 import { IceShard } from './ice-shard.js';

@@ -1,8 +1,9 @@
-import Phaser from '../../lib/phaser.js';
+import Phaser from '../../lib/phaser.mjs';
 import { DIRECTION } from '../../common/direction.js';
 import { getTargetPositionFromGameObjectPositionAndDirection } from '../../utils/grid-utils.js';
 import { exhaustiveGuard } from '../../utils/guard.js';
 import { TILE_SIZE } from '../../config.js';
+import socket from '../../scenes/world-scene.js';
 
 /**
  * @typedef CharacterIdleFrameConfig
@@ -38,6 +39,7 @@ import { TILE_SIZE } from '../../config.js';
  * @property {Phaser.Tilemaps.TilemapLayer} [reunion2Layer]
  * @property {Phaser.Tilemaps.TilemapLayer} [reunion3Layer]
  * @property {Phaser.Tilemaps.TilemapLayer} [reunion4Layer]
+ * @property {number} [id]
  * @property {number} [place]
  */
 
@@ -62,6 +64,10 @@ export class Character {
   _origin;
   /** @protected @type {Phaser.Tilemaps.TilemapLayer | undefined} */
   _collisionLayer;
+  /** @protected @type {number | undefined} */
+  _place;
+  /** @protected @type {number | undefined} */
+  _id;
 
   /**
    * @param {CharacterConfig} config
@@ -72,6 +78,7 @@ export class Character {
     }
 
     this._scene = config.scene;
+    this._id = config.id;
     this._direction = config.direction;
     this._isMoving = false;
     this._targetPosition = { ...config.position };
@@ -124,7 +131,7 @@ export class Character {
     if (this._isMoving) {
       return;
     }
-
+    
     // stop current animation and show idle frame
     const idleFrame = this._phaserGameObject.anims.currentAnim?.frames[1].frame.name;
     this._phaserGameObject.anims.stop();
@@ -162,9 +169,15 @@ export class Character {
   _moveSprite(direction) {
     this._direction = direction;
     if (this._isBlockingTile()) {
+      socket.emit('collision', {
+      collision: true
+      })
       return;
     }
     this._isMoving = true;
+    socket.emit('collision', {
+      collision: false
+      })
     this.#handleSpriteMovement();
   }
 
@@ -215,10 +228,16 @@ export class Character {
       targets: this._phaserGameObject,
       onComplete: () => {
         this._isMoving = false;
+        socket.emit('stop', {
+        })
         this._previousTargetPosition = { ...this._targetPosition };
         if (this._spriteGridMovementFinishedCallback) {
           this._spriteGridMovementFinishedCallback();
         }
+        // socket.emit('stop', {
+        //   id: socket.id,
+        // });
+        
       },
     });
   }

@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../lib/phaser.mjs';
 import * as WebFontLoader from '../lib/webfontloader.js';
 
 export class WebFontFileLoader extends Phaser.Loader.File {

@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../lib/phaser.mjs';
 import { DIRECTION } from '../common/direction.js';
 
 export class Controls {
@@ -73,13 +73,13 @@ export class Controls {
 
     /** @type {import('../common/direction.js').Direction} */
     let selectedDirection = DIRECTION.NONE;
-    if (this.#cursorKeys.left.isDown) {
+    if (Phaser.Input.Keyboard.JustDown(this.#cursorKeys.left)) {
       selectedDirection = DIRECTION.LEFT;
-    } else if (this.#cursorKeys.right.isDown) {
+    } else if (Phaser.Input.Keyboard.JustDown(this.#cursorKeys.right)) {
       selectedDirection = DIRECTION.RIGHT;
-    } else if (this.#cursorKeys.up.isDown) {
+    } else if (Phaser.Input.Keyboard.JustDown(this.#cursorKeys.up)) {
       selectedDirection = DIRECTION.UP;
-    } else if (this.#cursorKeys.down.isDown) {
+    } else if (Phaser.Input.Keyboard.JustDown(this.#cursorKeys.down)) {
       selectedDirection = DIRECTION.DOWN;
     }
 

@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../lib/phaser.mjs';
 
 /**
  * @param {Phaser.Scene} scene

@@ -1,5 +1,5 @@
-import Phaser from '../lib/phaser.js';
-import { DATA_ASSET_KEYS } from '../assets/asset-keys.js';
+import Phaser from '../lib/phaser.mjs';
+import { DATA_ASSET_KEYS } from '../assets/asset-keys.mjs';
 
 export class DataUtils {
   /**

@@ -1,4 +1,4 @@
-import { CHARACTER_ASSET_KEYS } from '../../assets/asset-keys.js';
+import { CHARACTER_ASSET_KEYS } from '../../assets/asset-keys.mjs';
 import { DIRECTION } from '../../common/direction.js';
 import { exhaustiveGuard } from '../../utils/guard.js';
 import { Character } from './character.js';
@@ -24,6 +24,8 @@ export class Player extends Character {
         RIGHT: 4,
       },
     });
+    this._id = config.id;
+    this._place = config.place;
   }
 
   /**

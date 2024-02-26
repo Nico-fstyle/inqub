@@ -1,25 +1,22 @@
-import Phaser from './lib/phaser.js';
 import { SCENE_KEYS } from './scenes/scene-keys.js';
 import { PreloadScene } from './scenes/preload-scene.js';
 import { BattleScene } from './scenes/battle-scene.js';
 import { WorldScene } from './scenes/world-scene.js';
+// WEBSOCKET SERVER COTE CLIENT : voir world_scene
 
+// const socket = io('ws://localhost:5000'); // Établir la connexion WebSocket
 
+// let players = [];
 
+// socket.on('connect', () => {
+//   console.log('connected');
+// });
 
-const socket = io(`ws://localhost:5000`);
+// socket.on('players', (serverPlayers) => {
+//   players = serverPlayers;
+// });
 
-let players = [];
-
-export default socket  ;
-
-socket.on('connect', () => {
-  console.log('connected');
-});
-
-socket.on('players', (serverPlayers) => {
-  players = serverPlayers;
-});
+// export { socket, players };
 
 const game = new Phaser.Game({
   type: Phaser.CANVAS,
@@ -35,21 +32,47 @@ const game = new Phaser.Game({
 });
 
 
-
 window.addEventListener('load', () => {
   const canvas = document.querySelector('canvas');
   if (canvas) {
-    canvas.style.borderRadius = '20px'; // Par exemple, un border radius de 10 pixels
-    canvas.style.overflow = 'hidden'; // Assurez-vous que le contenu ne dépasse pas les coins arrondis
-
+    canvas.style.borderRadius = '20px'; 
+    canvas.style.overflow = 'hidden'; 
   }
 });
 
-
-
-
-
 game.scene.add(SCENE_KEYS.PRELOAD_SCENE, PreloadScene);
 game.scene.add(SCENE_KEYS.WORLD_SCENE, WorldScene);
-game.scene.add(SCENE_KEYS.BATTLE_SCENE, BattleScene);
 game.scene.start(SCENE_KEYS.PRELOAD_SCENE);
+
+
+
+// let socket;
+// let players = [];
+
+// function initSocket(io) {
+//   socket = io;
+
+//   socket.on('connect', () => {
+//     console.log('connected');
+//   });
+
+//   socket.on('players', (serverPlayers) => {
+//     players = serverPlayers;
+//   });
+// }
+// initSocket(io);
+// export { socket, players };
+
+// const socket = io(`ws://localhost:5000`);
+
+// let players = [];
+
+// socket.on('connect', () => {
+//   console.log('connected');
+// });
+
+// socket.on('players', (serverPlayers) => {
+//   players = serverPlayers;
+// });
+
+// export default socket ;

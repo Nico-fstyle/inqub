@@ -1,15 +1,18 @@
-import Phaser from '../lib/phaser.js';
-import { WORLD_ASSET_KEYS } from '../assets/asset-keys.js';
+import Phaser from '../lib/phaser.mjs';
+import { WORLD_ASSET_KEYS } from '../assets/asset-keys.mjs';
 import { SCENE_KEYS } from './scene-keys.js';
 import { Player } from '../world/characters/player.js';
 import { Controls } from '../utils/controls.js';
 import { DIRECTION } from '../common/direction.js';
 import { TILED_COLLISION_LAYER_ALPHA, TILE_SIZE } from '../config.js';
-import socket from '../main.js';
-import players from '../main.js';
+// import { socket, players } from '../main.js';
+const socket = io('ws://localhost:5000'); // Établir la connexion WebSocket
+console.log(socket);
+export default socket;
 
+// let players = [];
 
-
+// On initialise le socket et les joueurs
 
 
 /** @type {import('../types/typedef.js').Coordinate} */
@@ -24,8 +27,6 @@ const PLAYER_POSITION = Object.freeze({
 */
 
 export class WorldScene extends Phaser.Scene {
-  /** @type {Player} */
-  #player;
   /** @type {Controls} */
   #controls;
   /** @type {Phaser.Tilemaps.TilemapLayer} */
@@ -58,14 +59,96 @@ export class WorldScene extends Phaser.Scene {
   #reunion3Layer;
   /** @type {Phaser.Tilemaps.TilemapLayer | undefined} */
   #reunion4Layer;
+  collisionLayer;
+  SelfId;
+  players;
+  /** @type {Player} */
+  #player;
+/** @type {Array<[Player, number]>} */
+  PLAYERS;
+  M;
 
   constructor() {
     super({
       key: SCENE_KEYS.WORLD_SCENE,
+    });
+  
+    this.M = [];
+    this.players = null;
+    this.PLAYERS = [];
+    this.collisionLayer = null;
+    this.SelfId = null;
+  
+    // Écouter l'événement de connexion Socket.IO
+    socket.on('newPlayerConnected', (conn) => {
+      console.log('HEYYYY connected');
+      this.players = conn.players;
+      // Initialiser le joueur une fois la connexion établie
+      
+      console.log(this.players);
+
+      if (!this.SelfId) {
+        this.SelfId = conn.selfId;
+        
+      };
 
     });
-    this.M = [];
+
   }
+  
+  initializePlayer(player,p) {
+    const config = {
+      scene: this,
+      id: player.id,
+      position: {
+        x: player.x,
+        y: player.y,
+      },
+      direction: player.direction,
+      collisionLayer: this.collisionLayer,
+      place: p,
+      spriteGridMovementFinishedCallback: () => {
+        this.#handlePlayerMovementUpdate();
+      }
+    };
+
+    // Créer et ajouter le joueur à la liste une fois initialisé
+    return new Player(config);
+  
+  }
+  
+  #handlePlayerMovementUpdate() {
+
+    for (let i = 0; i < this.M.length; i++) {
+    
+      const isLayer = this.M[i].getTileAtWorldXY(this.#player.sprite.x, this.#player.sprite.y, true).index !== -1;
+      if (!isLayer) {
+        if (this.M[i].depth === 1) {
+          socket.emit('encounter', {
+          layer: [i,-1]
+        });
+        
+        this.M[i].setDepth(-1);
+      }
+        
+      }
+      else {
+        if (this.M[i].depth === -1 || this.M[i].depth === 0) {
+        socket.emit('encounter', {
+          layer: [i,1]
+        });   
+        
+        this.M[i].setDepth(1).setAlpha(0.2);
+      }   
+  
+      }
+   
+    }
+    return;
+    
+  }
+
+  
 
   init() {
     console.log(`[${WorldScene.name}:init] invoked`);
@@ -73,6 +156,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
+
     console.log(`[${WorldScene.name}:create] invoked`);
 
     const x = 88 * TILE_SIZE;
@@ -84,15 +168,19 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 1280, 640);
     this.cameras.main.setZoom(1);
     this.cameras.main.centerOn(x, y);
+    const loopedSound = this.sound.add('Ambiance', { loop: true }).setVolume(0.2); 
+    loopedSound.play();
+
 
     // create map and collision layer
     const map = this.make.tilemap({ key: WORLD_ASSET_KEYS.WORLD_MAIN_LEVEL });
-    // this value comes from the width of the level background image we are using
-    // we set the max camera width to the size of our image in order to control what
-    // is visible to the player, since the phaser game world is infinite.
+
     this.cameras.main.setBounds(0, 0, 1280, 640);
     this.cameras.main.setZoom(1);
     this.cameras.main.centerOn(x, y);
+
+    // #region Tiled layers
+
     // The first parameter is the name of the tileset in Tiled and the second parameter is the key
     // of the tileset image used when loading the file in preload.
     const collisionTiles = map.addTilesetImage('collision', WORLD_ASSET_KEYS.WORLD_COLLISION);
@@ -100,12 +188,12 @@ export class WorldScene extends Phaser.Scene {
       console.log(`[${WorldScene.name}:create] encountered error while creating collision tiles from tiled`);
       return;
     }
-    const collisionLayer = map.createLayer('Collision', collisionTiles, 0, 0);
-    if (!collisionLayer) {
+    this.collisionLayer = map.createLayer('Collision', collisionTiles, 0, 0);
+    if (!this.collisionLayer) {
       console.log(`[${WorldScene.name}:create] encountered error while creating collision layer using data from tiled`);
       return;
     }
-    collisionLayer.setAlpha(TILED_COLLISION_LAYER_ALPHA).setDepth(0);
+    this.collisionLayer.setAlpha(TILED_COLLISION_LAYER_ALPHA).setDepth(0);
 
     // AJOUT DES TILED DE REUNIONS 
 
@@ -269,32 +357,43 @@ export class WorldScene extends Phaser.Scene {
     }
     this.#work8Layer.setAlpha(0.5).setDepth(0);
 
-
-    // NEXT 
-
-    this.add.image(0, 0, WORLD_ASSET_KEYS.WORLD_BACKGROUND, 0).setOrigin(0);
-
-    
-    
-    this.#player = new Player({
-      scene: this,
-      position: PLAYER_POSITION,
-      direction: DIRECTION.DOWN,
-      collisionLayer: collisionLayer,
-      place: -1,
-      spriteGridMovementFinishedCallback: () => {
-        this.#handlePlayerMovementUpdate();
-      }
-    });
-    const CAMERA_SPEED = 0.7;
+// #endregion
     this.M = [this.#work1Layer, this.#work2Layer, this.#work3Layer, this.#work4Layer, this.#work5Layer, this.#work6Layer, this.#work7Layer, this.#work8Layer, this.#chiefLayer, this.#reunion1Layer, this.#reunion2Layer, this.#reunion3Layer, this.#reunion4Layer];
 
+    // NEXT 
+    
+    this.add.image(0, 0, WORLD_ASSET_KEYS.WORLD_BACKGROUND, 0).setOrigin(0);
+
+    for (let i = 0; i < this.players.length; i++) {
+      let p = -1;
+      var indice = this.players[i].encounters.indexOf(1);
+      if (indice !== -1) {
+        p = indice;
+    } ;
+    this.PLAYERS.push([this.initializePlayer(this.players[i], p), this.players[i].id]);
+    console.log(this.PLAYERS);
+    };
+    const PLAYERcc = this.PLAYERS.find(p => p[1] === this.SelfId);
+        if (!PLAYERcc) {
+          return;
+        }
+    const [PLAYER, _] = PLAYERcc; // Décompose le tuple pour récupérer l'objet Player
+    this.#player = PLAYER;
+    console.log(`the player id is ${this.SelfId}`)
+    
+    if (!this.#player) {
+        return; // Le joueur n'est pas encore disponible, on arrête ici
+    }
+    const CAMERA_SPEED = 0.7;
+      this.cameras.main.startFollow(this.#player.sprite, true, CAMERA_SPEED, CAMERA_SPEED);
+      this.cameras.main.setFollowOffset(0, 200);
+    
+    
+
+    // #region Camera
 
     // Créer un effet de survol pour la caméra
-    this.cameras.main.startFollow(this.#player.sprite, true, CAMERA_SPEED, CAMERA_SPEED);
-    
-    // Définir la zone de décalage pour centrer le joueur dans la caméra
-    this.cameras.main.setFollowOffset(0, 200);
+
     // create foreground for depth
     this.add.image(0, 0, WORLD_ASSET_KEYS.WORLD_FOREGROUND, 0).setOrigin(0).setDepth(3);
 
@@ -352,12 +451,17 @@ export class WorldScene extends Phaser.Scene {
       }
       initialDistance = 0;
     });
-
-    // Centrer la caméra sur le personnage
-    this.cameras.main.startFollow(this.#player.sprite);
   
-    
+    // #endregion
   }
+
+  
+  // removePlayer(playerId) {
+  //   const playerIndex = this.players.findIndex(player => player.id === playerId);
+  //   if (playerIndex !== -1) {
+  //     this.players[playerIndex].destroy();
+  //     this.players.splice(playerIndex, 1);
+  //   }}
 
   /**
    * @param {DOMHighResTimeStamp} time
@@ -366,58 +470,70 @@ export class WorldScene extends Phaser.Scene {
 
   
   update(time) {
-    if (this.#wildMonsterEncountered) {
-      this.#player.update(time);
+
+    const newPlayers = this.players.filter(player => !this.PLAYERS.find(p => p[1] === player.id));
+
+    // Parcourir les nouveaux joueurs et les ajouter à la liste `PLAYERS`
+    newPlayers.forEach(newPlayer => {
+        let p = -1;
+        const indice = newPlayer.encounters.indexOf(1);
+        if (indice !== -1) {
+            p = indice;
+        }
+
+        const playerInstance = this.initializePlayer(newPlayer, p);
+        this.PLAYERS.push([playerInstance, newPlayer.id]);
+    });
+
+    const PLAYERcc = this.PLAYERS.find(p => p[1] === this.SelfId);
+        if (!PLAYERcc) {
+          return;
+        }
+    const [PLAYER, _] = PLAYERcc; // Décompose le tuple pour récupérer l'objet Player
+    socket.on('players', (serverPlayers) => {
+        
+        serverPlayers.forEach(playr => {
+        const id = playr.id;
+        if (id === this.SelfId) {
+          return;
+        }
+        const PLAYERc = this.PLAYERS.find(p => p[1] === id);
+        if (!PLAYERc) {
+          return;
+        }
+        const [PlayerObj, _] = PLAYERc; // Décompose le tuple pour récupérer l'objet Player
+
+        if (!PlayerObj) {
+            return; // L'objet Player n'est pas valide, on arrête ici
+        }
+          if ( playr.direction !== DIRECTION.NONE && playr.moving === true) {
+          PlayerObj.moveCharacter(playr.direction);
+        }
+        PlayerObj.update(time);
+        
+      });
+    });
+    
+    if (!PLAYER) {
       return;
     }
 
     const selectedDirection = this.#controls.getDirectionKeyPressedDown();
     if (selectedDirection !== DIRECTION.NONE) {
-      this.#player.moveCharacter(selectedDirection);
+      PLAYER.moveCharacter(selectedDirection);
       socket.emit('move', {
+        id: this.SelfId,
         x: this.#player.sprite.x,
         y: this.#player.sprite.y,
+        direction: selectedDirection,
       });
     }
 
     this.#player.update(time);
 
-
-
 };
 
 
- 
-#handlePlayerMovementUpdate() {
-
-  for (let i = 0; i < this.M.length; i++) {
-  
-    const isLayer = this.M[i].getTileAtWorldXY(this.#player.sprite.x, this.#player.sprite.y, true).index !== -1;
-    if (!isLayer) {
-      if (this.M[i].depth === 1) {
-        socket.emit('encounter', {
-        layer: [i,-1]
-      });
-      
-      this.M[i].setDepth(-1);
-    }
-      
-    }
-    else {
-      if (this.M[i].depth === -1 || this.M[i].depth === 0) {
-      socket.emit('encounter', {
-        layer: [i,1]
-      });   
-      
-      this.M[i].setDepth(1).setAlpha(0.2);
-    }   
-
-    }
- 
-  }
-  return;
-  
-}
 
 
-}
+};

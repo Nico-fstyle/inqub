@@ -1,5 +1,5 @@
-import Phaser from '../lib/phaser.js';
-import { BATTLE_BACKGROUND_ASSET_KEYS } from '../assets/asset-keys.js';
+import Phaser from '../lib/phaser.mjs';
+import { BATTLE_BACKGROUND_ASSET_KEYS } from '../assets/asset-keys.mjs';
 
 export class Background {
   /** @type {Phaser.Scene} */
